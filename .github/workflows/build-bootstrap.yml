@@ -6,9 +6,10 @@ on:
       arch:
         description: 'Architecture to build'
         required: true
-        default: 'aarch64'
+        default: 'aarch64,arm'
         type: choice
         options:
+          - aarch64,arm
           - aarch64
           - arm
           - i686
