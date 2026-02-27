@@ -12,7 +12,7 @@ on:
       - master
     paths:
       - 'scripts/build-sharp-packages.sh'
-      - 'scripts/create-botdrop-repo.sh'
+      - 'scripts/create-xiaoclaw-repo.sh'
       - '.github/workflows/build-sharp-packages.yml'
 
 permissions:
@@ -71,14 +71,14 @@ jobs:
       - name: Create APT repository
         run: |
           echo "Creating APT repository..."
-          chmod +x ./scripts/create-botdrop-repo.sh
-          ./scripts/create-botdrop-repo.sh ./debs-output ./botdrop-repo aarch64
+          chmod +x ./scripts/create-xiaoclaw-repo.sh
+          ./scripts/create-xiaoclaw-repo.sh ./debs-output ./xiaoclaw-repo aarch64
 
       - name: Upload repository artifact
         uses: actions/upload-artifact@v4
         with:
-          name: botdrop-repo-aarch64
-          path: botdrop-repo-aarch64.zip
+          name: xiaoclaw-repo-aarch64
+          path: xiaoclaw-repo-aarch64.zip
           retention-days: 30
           compression-level: 0  # Already compressed
 
@@ -94,7 +94,7 @@ jobs:
       - name: Download repository artifact
         uses: actions/download-artifact@v4
         with:
-          name: botdrop-repo-aarch64
+          name: xiaoclaw-repo-aarch64
           path: ./
 
       - name: Generate release tag
@@ -141,17 +141,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # Get package count from repository
-          REPO_ZIP="botdrop-repo-aarch64.zip"
+          REPO_ZIP="xiaoclaw-repo-aarch64.zip"
           PKG_COUNT=$(unzip -l "$REPO_ZIP" | grep -c '\.deb$' || echo "unknown")
 
           # Get archive size
           ARCHIVE_SIZE=$(du -h "$REPO_ZIP" | cut -f1)
 
           gh release create "${{ steps.tag.outputs.tag }}" \
-            --title "BotDrop Packages - ${{ steps.tag.outputs.tag }}" \
-            --notes "## BotDrop Package Repository
+            --title "XiaoClaw Packages - ${{ steps.tag.outputs.tag }}" \
+            --notes "## XiaoClaw Package Repository
 
-          This release contains a custom APT repository for BotDrop with sharp/libvips support.
+          This release contains a custom APT repository for XiaoClaw with sharp/libvips support.
 
           ### 📦 Contents
           - **Packages:** $PKG_COUNT .deb files
@@ -164,7 +164,7 @@ jobs:
           - 6 build tools (needed when npm builds sharp from source)
 
           ### 📱 Usage (Automatic)
-          BotDrop app automatically configures this repository on first launch.
+          XiaoClaw app automatically configures this repository on first launch.
           Users can then install packages with:
           \`\`\`bash
           pkg update
@@ -175,7 +175,7 @@ jobs:
           ### 🔧 Manual Configuration (Advanced)
           If you need to manually configure the repository:
           \`\`\`bash
-          echo 'deb https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.tag }}/ stable main' > \$PREFIX/etc/apt/sources.list.d/botdrop-packages.list
+          echo 'deb https://github.com/${{ github.repository }}/releases/download/${{ steps.tag.outputs.tag }}/ stable main' > \$PREFIX/etc/apt/sources.list.d/xiaoclaw-packages.list
           pkg update
           \`\`\`
 
@@ -185,7 +185,7 @@ jobs:
           - **Workflow:** ${{ github.run_id }}
 
           ---
-          *Built with BotDrop package build system*" \
+          *Built with XiaoClaw package build system*" \
             "$REPO_ZIP"
 
           echo "✅ Release created successfully: ${{ steps.tag.outputs.tag }}"
@@ -201,14 +201,14 @@ jobs:
 
           # Create new packages-latest release
           gh release create packages-latest \
-            --title "BotDrop Packages - Latest" \
-            --notes "Latest stable package repository for BotDrop.
+            --title "XiaoClaw Packages - Latest" \
+            --notes "Latest stable package repository for XiaoClaw.
 
           This is an alias that always points to the most recent successful build.
 
           **Current version:** ${{ steps.tag.outputs.tag }}
 
           For detailed release notes, see: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag.outputs.tag }}" \
-            "botdrop-repo-aarch64.zip"
+            "xiaoclaw-repo-aarch64.zip"
 
           echo "✅ Updated packages-latest release to point to ${{ steps.tag.outputs.tag }}"

@@ -7,22 +7,22 @@
 ## different build environments (macOS, Linux, Docker).
 ##
 ## Usage:
-##   ./scripts/create-botdrop-repo.sh [debs-dir] [repo-dir] [arch]
+##   ./scripts/create-xiaoclaw-repo.sh [debs-dir] [repo-dir] [arch]
 ##
 ## Arguments:
 ##   debs-dir   Directory containing .deb files (default: ./debs-output)
-##   repo-dir   Output directory for repository (default: ./botdrop-repo)
+##   repo-dir   Output directory for repository (default: ./xiaoclaw-repo)
 ##   arch       Architecture (default: aarch64)
 ##
 ## Output:
 ##   - repo-dir/              APT repository structure
-##   - botdrop-repo-ARCH.zip  Compressed repository archive
+##   - xiaoclaw-repo-ARCH.zip Compressed repository archive
 ##
 
 set -e
 
 DEBS_DIR="${1:-./debs-output}"
-REPO_DIR="${2:-./botdrop-repo}"
+REPO_DIR="${2:-./xiaoclaw-repo}"
 ARCH="${3:-aarch64}"
 
 # Detect stat command (BSD vs GNU)
@@ -105,7 +105,7 @@ parse_deb_control() {
 }
 
 echo "========================================"
-echo "  BotDrop APT Repository Creator"
+echo "  XiaoClaw APT Repository Creator"
 echo "========================================"
 echo ""
 echo "Input directory:  $DEBS_DIR"
@@ -175,25 +175,25 @@ echo "Generating Release files..."
 cat > "$REPO_DIR/dists/stable/main/binary-${ARCH}/Release" << EOF
 Archive: stable
 Component: main
-Origin: BotDrop
-Label: BotDrop Packages
+Origin: XiaoClaw
+Label: XiaoClaw Packages
 Architecture: ${ARCH}
 EOF
 
 cat > "$REPO_DIR/dists/stable/Release" << EOF
-Origin: BotDrop
-Label: BotDrop Packages
+Origin: XiaoClaw
+Label: XiaoClaw Packages
 Suite: stable
 Codename: stable
 Date: $(date -u +"%a, %d %b %Y %H:%M:%S UTC")
 Architectures: ${ARCH}
 Components: main
-Description: BotDrop custom packages for sharp support
+Description: XiaoClaw custom packages for sharp support
 EOF
 
 # Create archive
 echo "Creating repository archive..."
-archive_name="botdrop-repo-${ARCH}.zip"
+archive_name="xiaoclaw-repo-${ARCH}.zip"
 
 cd "$(dirname "$REPO_DIR")"
 zip -r -q "$archive_name" "$(basename "$REPO_DIR")"

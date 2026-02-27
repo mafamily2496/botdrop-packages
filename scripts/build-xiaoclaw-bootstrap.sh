@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 ##
-##  Generate BotDrop bootstrap archives using pre-built packages from
-##  the Termux apt repository. Much faster than build-botdrop-bootstrap.sh
-##  which compiles everything from source (~3h vs ~5min).
+##  Script for building XiaoClaw custom bootstrap archives.
+##
+##  This is a wrapper around build-bootstraps.sh that adds XiaoClaw-specific
+##  packages to the bootstrap.
 ##
 ##  Usage:
-##    ./scripts/generate-botdrop-bootstrap.sh [--architectures aarch64]
+##    ./scripts/run-docker.sh ./scripts/build-xiaoclaw-bootstrap.sh [options]
+##
+##  Options are passed through to build-bootstraps.sh
 ##
 
 set -e
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-# BotDrop additional packages to include in the bootstrap.
-BOTDROP_PACKAGES=(
+# XiaoClaw additional packages to include in the bootstrap.
+XIAOCLAW_PACKAGES=(
     "nodejs-lts"      # Node.js LTS runtime
     "npm"             # npm package manager
     "git"             # Git version control
@@ -26,21 +29,20 @@ BOTDROP_PACKAGES=(
 )
 
 # Convert array to comma-separated list
-BOTDROP_PACKAGES_CSV=$(IFS=,; echo "${BOTDROP_PACKAGES[*]}")
+XIAOCLAW_PACKAGES_CSV=$(IFS=,; echo "${XIAOCLAW_PACKAGES[*]}")
 
 echo "========================================"
-echo "  BotDrop Bootstrap Generator (fast mode)"
+echo "  XiaoClaw Bootstrap Builder"
 echo "========================================"
 echo ""
 echo "Additional packages to include:"
-for pkg in "${BOTDROP_PACKAGES[@]}"; do
+for pkg in "${XIAOCLAW_PACKAGES[@]}"; do
     echo "  - ${pkg}"
 done
 echo ""
-echo "Using pre-built packages from Termux apt repo"
 echo "========================================"
 
-# Run generate-bootstraps.sh with BotDrop packages.
-exec "${SCRIPT_DIR}/generate-bootstraps.sh" \
-    --add "${BOTDROP_PACKAGES_CSV}" \
+# Run the standard build-bootstraps.sh with XiaoClaw packages added.
+exec "${SCRIPT_DIR}/build-bootstraps.sh" \
+    --add "${XIAOCLAW_PACKAGES_CSV}" \
     "$@"

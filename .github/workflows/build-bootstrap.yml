@@ -1,4 +1,4 @@
-name: Build BotDrop Bootstrap (Source)
+name: Build XiaoClaw Bootstrap (Source)
 
 on:
   workflow_dispatch:
@@ -24,10 +24,10 @@ on:
     branches:
       - main
       - master
-      - feature/app-botdrop-prefix
+      - feature/app-xiaoclaw-prefix
     paths:
-      - 'scripts/build-botdrop-bootstrap.sh'
-      - 'scripts/generate-botdrop-bootstrap.sh'
+      - 'scripts/build-xiaoclaw-bootstrap.sh'
+      - 'scripts/generate-xiaoclaw-bootstrap.sh'
       - 'scripts/build-bootstraps.sh'
       - 'scripts/generate-bootstraps.sh'
       - 'scripts/audit-bootstrap-archive.sh'
@@ -37,7 +37,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: botdrop-bootstrap-src-${{ github.ref }}
+  group: xiaoclaw-bootstrap-src-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -77,11 +77,11 @@ jobs:
           echo "=== Checking TERMUX_APP__PACKAGE_NAME ==="
           grep 'TERMUX_APP__PACKAGE_NAME=' scripts/properties.sh | head -5
           echo ""
-          echo "Expected: app.botdrop"
-          if grep -q 'TERMUX_APP__PACKAGE_NAME="app.botdrop"' scripts/properties.sh; then
-            echo "✅ Package name is correctly set to app.botdrop"
+          echo "Expected: app.xiaoclaw"
+          if grep -q 'TERMUX_APP__PACKAGE_NAME="app.xiaoclaw"' scripts/properties.sh; then
+            echo "✅ Package name is correctly set to app.xiaoclaw"
           else
-            echo "❌ Package name is NOT set to app.botdrop!"
+            echo "❌ Package name is NOT set to app.xiaoclaw!"
             exit 1
           fi
 
@@ -108,7 +108,7 @@ jobs:
       - name: Build bootstrap from source
         run: |
           echo "=== Building from SOURCE (not pre-built packages) ==="
-          echo "This compiles all packages from scratch so app.botdrop prefix takes effect"
+          echo "This compiles all packages from scratch so app.xiaoclaw prefix takes effect"
           echo "Timeout: 8 hours"
           echo ""
 
@@ -137,7 +137,7 @@ jobs:
 
               cd /home/builder/termux-packages
 
-              ./scripts/build-botdrop-bootstrap.sh \
+              ./scripts/build-xiaoclaw-bootstrap.sh \
                 --architectures '"${{ steps.arch.outputs.architectures }}"'
             ' 2>&1 | tee build.log
 
@@ -181,7 +181,7 @@ jobs:
       - name: Upload bootstrap archive
         uses: actions/upload-artifact@v4
         with:
-          name: botdrop-bootstrap-src-${{ steps.arch.outputs.architectures }}
+          name: xiaoclaw-bootstrap-src-${{ steps.arch.outputs.architectures }}
           path: "dist/*.zip"
           retention-days: 30
           if-no-files-found: error
@@ -206,7 +206,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: botdrop-bootstrap-src-*
+          pattern: xiaoclaw-bootstrap-src-*
           merge-multiple: true
           path: ./bootstraps
 
@@ -221,7 +221,7 @@ jobs:
           DATE_TAG="bootstrap-$(date '+%Y.%m.%d')"
 
           git fetch --tags
-          EXISTING=$(git tag -l "${DATE_TAG}-r*+botdrop" | sort -V | tail -1 || true)
+          EXISTING=$(git tag -l "${DATE_TAG}-r*+xiaoclaw" | sort -V | tail -1 || true)
 
           if [ -n "$EXISTING" ]; then
             REV=$(echo "$EXISTING" | grep -oP 'r\K\d+' || echo "0")
@@ -230,7 +230,7 @@ jobs:
             NEW_REV=1
           fi
 
-          TAG_NAME="${DATE_TAG}-r${NEW_REV}+botdrop"
+          TAG_NAME="${DATE_TAG}-r${NEW_REV}+xiaoclaw"
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
           echo "Generated tag: $TAG_NAME"
 
@@ -241,9 +241,9 @@ jobs:
           TAG_NAME="${{ steps.tag.outputs.tag_name }}"
 
           cat > release_notes.md << 'NOTES'
-          ## BotDrop Bootstrap Archives (Source Build + Slim)
+          ## XiaoClaw Bootstrap Archives (Source Build + Slim)
 
-          Custom bootstrap archives built **from source** with `app.botdrop` package prefix.
+          Custom bootstrap archives built **from source** with `app.xiaoclaw` package prefix.
           Optimized with binary stripping and non-essential file removal.
 
           ### Included packages:
@@ -256,13 +256,13 @@ jobs:
           - **expect** - expect for automated password setup
           - **android-tools** - adb/fastboot for wireless ADB fallback
 
-          ### Package prefix: `app.botdrop`
+          ### Package prefix: `app.xiaoclaw`
           NOTES
 
           gh release create "$TAG_NAME" \
-            --title "BotDrop Bootstrap $TAG_NAME" \
+            --title "XiaoClaw Bootstrap $TAG_NAME" \
             --notes-file release_notes.md \
-            --target feature/app-botdrop-prefix \
+            --target feature/app-xiaoclaw-prefix \
             ./bootstraps/*.zip
 
       - name: Summary
@@ -270,7 +270,7 @@ jobs:
           echo "## Bootstrap Source Build Complete! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Release Tag:** ${{ steps.tag.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Package Prefix:** app.botdrop" >> $GITHUB_STEP_SUMMARY
+          echo "**Package Prefix:** app.xiaoclaw" >> $GITHUB_STEP_SUMMARY
           echo "**Build Type:** Source (compiled + slimmed)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
