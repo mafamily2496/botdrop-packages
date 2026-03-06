@@ -26,6 +26,8 @@ XIAOCLAW_PACKAGES=(
     "proot"           # proot for /tmp support via termux-chroot
     "expect"          # expect for automated password setup
     "android-tools"   # adb/fastboot for wireless ADB fallback
+    "chromium"
+    "rclone"
 )
 
 # Convert array to comma-separated list
